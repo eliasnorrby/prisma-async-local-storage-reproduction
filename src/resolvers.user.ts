@@ -10,11 +10,12 @@ import {
   InputType,
   Field,
 } from '@nestjs/graphql'
-import { Inject } from '@nestjs/common'
+import { Inject, Logger } from '@nestjs/common'
 import { Post } from './post'
 import { User } from './user'
 import { PrismaService } from './prisma.service'
 import { PostCreateInput } from './resolvers.post'
+import { ClsService } from 'nestjs-cls'
 
 @InputType()
 class UserUniqueInput {
@@ -39,7 +40,9 @@ class UserCreateInput {
 
 @Resolver(User)
 export class UserResolver {
-  constructor(@Inject(PrismaService) private prismaService: PrismaService) {}
+  constructor(@Inject(PrismaService) private prismaService: PrismaService, private cls: ClsService) {}
+
+  private readonly logger = new Logger(UserResolver.name)
 
   @ResolveField()
   async posts(@Root() user: User, @Context() ctx): Promise<Post[]> {
@@ -74,6 +77,8 @@ export class UserResolver {
 
   @Query((returns) => [User], { nullable: true })
   async allUsers(@Context() ctx) {
+    const requestId = this.cls.getId()
+    this.logger.log(`allUsers, requestId: '${requestId}'`)
     return this.prismaService.user.findMany()
   }
 
