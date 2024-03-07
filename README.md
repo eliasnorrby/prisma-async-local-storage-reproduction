@@ -1,5 +1,7 @@
 # Async local storage not available reproduction
 
+Uses Nest.js and `nestjs-cls` to demonstrate how async local storage cannot be accessed in primsa's `$on('query')` handlers.
+
 ## Getting started
 
 ```
